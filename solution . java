@@ -1,0 +1,57 @@
+import java.util.*;
+
+public class FraudDetector {
+
+    public static List<String> detectFraud(Map<String, List<Transaction>> transactions) {
+        List<String> suspicious = new ArrayList<>();
+
+        for (Map.Entry<String, List<Transaction>> entry : transactions.entrySet()) {
+            String user = entry.getKey();
+            List<Transaction> txns = entry.getValue();
+
+            for (Transaction txn : txns) {
+                if (txn.amount > 50000) {
+                    suspicious.add(user + " | Amount: " + txn.amount + " | Reason: High Value");
+                }
+            }
+            if (txns.size() > 3) {
+                suspicious.add(user + " | Count: " + txns.size() + " | Reason: Too Many Transactions");
+            }
+        }
+        return suspicious;
+    }
+
+    public static void main(String[] args) {
+        Map<String, List<Transaction>> transactions = new HashMap<>();
+
+        transactions.put("User1", Arrays.asList(
+                new Transaction(60000, "10:01"),
+                new Transaction(2000, "10:02")
+        ));
+
+        transactions.put("User2", Arrays.asList(
+                new Transaction(1000, "11:00"),
+                new Transaction(2000, "11:01"),
+                new Transaction(3000, "11:02"),
+                new Transaction(4000, "11:03")
+        ));
+
+        List<String> result = detectFraud(transactions);
+        for (String s : result) {
+            System.out.println(s);
+        }
+        // Expected:
+        // User1 | Amount: 60000 | Reason: High Value
+        // User2 | Count: 4 | Reason: Too Many Transactions
+    }
+}
+
+class Transaction {
+    int amount;
+    String timestamp;
+
+    Transaction(int amount, String timestamp) {
+        this.amount = amount;
+        this.timestamp = timestamp;
+    }
+}
